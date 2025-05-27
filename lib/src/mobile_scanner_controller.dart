@@ -128,7 +128,7 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
   StreamSubscription<double>? _zoomScaleSubscription;
   StreamSubscription<DeviceOrientation>? _deviceOrientationSubscription;
 
-  bool _isDisposed = false;
+  bool isDisposed = false;
   // This completer keeps track of whether the MobileScanner widget,
   // that is attached to this controller,
   // called its `initState()` lifecycle method.
@@ -169,7 +169,7 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
 
     _torchStateSubscription = MobileScannerPlatform.instance.torchStateStream
         .listen((TorchState torchState) {
-          if (_isDisposed) {
+          if (isDisposed) {
             return;
           }
 
@@ -178,7 +178,7 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
 
     _zoomScaleSubscription = MobileScannerPlatform.instance.zoomScaleStateStream
         .listen((double zoomScale) {
-          if (_isDisposed) {
+          if (isDisposed) {
             return;
           }
 
@@ -191,7 +191,7 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
       _deviceOrientationSubscription = implementation
           .deviceOrientationChangedStream
           .listen((DeviceOrientation orientation) {
-            if (_isDisposed) {
+            if (isDisposed) {
               return;
             }
 
@@ -210,7 +210,7 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
       );
     }
 
-    if (_isDisposed) {
+    if (isDisposed) {
       throw MobileScannerException(
         errorCode: MobileScannerErrorCode.controllerDisposed,
         errorDetails: MobileScannerErrorDetails(
@@ -228,7 +228,7 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
     // to inactive,
     // due to the permission popup gaining focus.
     // This would 'stop' the camera while it is not ready yet.
-    if (!value.isInitialized || !value.isRunning || _isDisposed) {
+    if (!value.isInitialized || !value.isRunning || isDisposed) {
       return false;
     }
 
@@ -331,7 +331,7 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
   /// If the permission is denied on iOS, MacOS or Web, there is no way to
   /// request it again.
   Future<void> start({CameraFacing? cameraDirection}) async {
-    if (_isDisposed) {
+    if (isDisposed) {
       throw MobileScannerException(
         errorCode: MobileScannerErrorCode.controllerDisposed,
         errorDetails: MobileScannerErrorDetails(
@@ -361,7 +361,7 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
 
       // Abort if the controller was disposed
       // while waiting for the widget to be attached.
-      if (_isDisposed) {
+      if (isDisposed) {
         throw MobileScannerException(
           errorCode: MobileScannerErrorCode.controllerDisposed,
           errorDetails: MobileScannerErrorDetails(
@@ -394,7 +394,7 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
       );
     }
 
-    if (!_isDisposed) {
+    if (!isDisposed) {
       value = value.copyWith(isStarting: true);
     }
 
@@ -416,7 +416,7 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
       final MobileScannerViewAttributes viewAttributes =
           await MobileScannerPlatform.instance.start(options);
 
-      if (!_isDisposed) {
+      if (!isDisposed) {
         value = value.copyWith(
           availableCameras: viewAttributes.numberOfCameras,
           cameraDirection: viewAttributes.cameraDirection,
@@ -434,7 +434,7 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
       // The initialization finished with an error.
       // To avoid stale values, reset the camera direction,
       // output size, torch state and zoom scale to the defaults.
-      if (!_isDisposed) {
+      if (!isDisposed) {
         value = value.copyWith(
           cameraDirection: CameraFacing.unknown,
           isInitialized: true,
@@ -540,7 +540,7 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
   /// If [window] is null, the scan window will be reset to the full camera
   /// preview.
   Future<void> updateScanWindow(Rect? window) async {
-    if (_isDisposed || !value.isInitialized) {
+    if (isDisposed || !value.isInitialized) {
       return;
     }
 
@@ -552,11 +552,11 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
   /// Once the controller is disposed, it cannot be used anymore.
   @override
   Future<void> dispose() async {
-    if (_isDisposed) {
+    if (isDisposed) {
       return;
     }
 
-    _isDisposed = true;
+    isDisposed = true;
     unawaited(_barcodesController.close());
     super.dispose();
 
