@@ -132,7 +132,7 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
   // This completer keeps track of whether the MobileScanner widget,
   // that is attached to this controller,
   // called its `initState()` lifecycle method.
-  final Completer<void> _isAttachedCompleter = Completer<void>();
+  final Completer<void> isAttachedCompleter = Completer<void>();
 
   void _disposeListeners() {
     _barcodesSubscription?.cancel();
@@ -343,11 +343,11 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
     // If start was called before the MobileScanner widget
     // had a chance to call its initState method,
     // wait for it to be called, using a timeout.
-    if (!_isAttachedCompleter.isCompleted) {
+    if (!isAttachedCompleter.isCompleted) {
       // The timeout is currently an arbitrary value,
       // which should be long enough for the next frame
       // to propagate any pending changes to the widget tree.
-      await _isAttachedCompleter.future
+      await isAttachedCompleter.future
           .timeout(const Duration(milliseconds: 500))
           .catchError((Object error, StackTrace stackTrace) {
             throw MobileScannerException(
@@ -570,10 +570,10 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
   /// and is not intended to be used directly.
   @internal
   void attach() {
-    if (_isAttachedCompleter.isCompleted) {
+    if (isAttachedCompleter.isCompleted) {
       return;
     }
 
-    _isAttachedCompleter.complete();
+    isAttachedCompleter.complete();
   }
 }
